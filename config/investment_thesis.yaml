@@ -1,0 +1,335 @@
+# Investment Thesis Configuration
+# This file defines the VC firm's investment strategy, evaluation criteria,
+# and preferences that shape agent behavior throughout the system.
+
+# Metadata
+config_version: "1.0.0"
+firm_name: "Example Ventures"
+created_date: "2025-01-15"
+last_updated: "2025-01-15"
+
+# Stage Preferences
+stage_preferences:
+  - name: "seed"
+    min_check_size: 500000
+    max_check_size: 2000000
+    target_ownership: 15.0
+    priority: 1
+
+  - name: "series-a"
+    min_check_size: 2000000
+    max_check_size: 10000000
+    target_ownership: 12.0
+    priority: 2
+
+  - name: "pre-seed"
+    min_check_size: 250000
+    max_check_size: 750000
+    target_ownership: 10.0
+    priority: 3
+
+# Sector Preferences
+sector_preferences:
+  - name: "SaaS"
+    expertise_level: "high"
+    specific_guidance: |
+      Focus on B2B SaaS with strong unit economics. Look for Rule of 40 trajectory.
+      Prioritize companies with annual contracts and low churn.
+    sub_sectors:
+      - "Sales & Marketing Tech"
+      - "DevOps & Infrastructure"
+      - "Vertical SaaS"
+      - "Collaboration Tools"
+
+  - name: "Fintech"
+    expertise_level: "moderate"
+    specific_guidance: |
+      Evaluate regulatory risk carefully. Focus on embedded fintech and B2B payment solutions.
+      Avoid consumer lending unless exceptional team.
+    sub_sectors:
+      - "Payment Infrastructure"
+      - "Embedded Fintech"
+      - "B2B Payments"
+
+  - name: "Healthcare Tech"
+    expertise_level: "learning"
+    specific_guidance: |
+      Prioritize digital health solutions with clear reimbursement paths.
+      Require healthcare domain expertise on founding team.
+    sub_sectors:
+      - "Digital Health"
+      - "Healthcare Infrastructure"
+
+  - name: "Consumer Social"
+    expertise_level: "avoid"
+    specific_guidance: "Generally avoid unless exceptional circumstances"
+    sub_sectors: []
+
+# Geographic Scope
+geographic_scope:
+  - "United States"
+  - "Canada"
+  - "Western Europe"
+
+# Fund Strategy
+fund_strategy:
+  fund_size: 100000000
+  deployment_target_years: 3
+  reserve_ratio: 0.50
+  target_portfolio_size: 25
+  concentration_strategy: "moderately concentrated"
+
+# Team Evaluation Criteria
+team_criteria:
+  - name: "Founder-Market Fit"
+    weight: 40
+    guidance: |
+      Assess depth of domain expertise. Look for 5+ years in the industry.
+      Founders should have direct experience with the problem they're solving.
+    required: true
+
+  - name: "Technical Co-Founder"
+    weight: 30
+    guidance: |
+      At least one co-founder should have strong technical background.
+      For infrastructure/dev tools, technical depth is critical.
+    threshold: 1.0
+    required: true
+
+  - name: "Previous Startup Experience"
+    weight: 20
+    guidance: |
+      Prior startup experience (success or instructive failure) is highly valuable.
+      Not required but strong positive signal.
+    required: false
+
+  - name: "Grit and Resilience"
+    weight: 10
+    guidance: |
+      Look for evidence of overcoming obstacles, pivoting when necessary,
+      sustained commitment to hard problems.
+    required: false
+
+# Market Evaluation Criteria
+market_criteria:
+  - name: "TAM Size"
+    weight: 30
+    guidance: "Minimum $1B TAM for seed stage. Validate using multiple methodologies."
+    threshold: 1000000000
+    required: true
+
+  - name: "Market Growth Rate"
+    weight: 25
+    guidance: "Prefer markets growing >20% CAGR. Minimum 10% for seed stage."
+    threshold: 10.0
+    required: true
+
+  - name: "Market Timing"
+    weight: 25
+    guidance: |
+      Assess whether market is ready for this solution now.
+      Too early = missionary selling. Too late = commoditized.
+    required: true
+
+  - name: "Competitive Dynamics"
+    weight: 20
+    guidance: |
+      Prefer fragmented markets or clear wedge in concentrated markets.
+      Assess network effects and winner-take-most potential.
+    required: true
+
+# Product Evaluation Criteria
+product_criteria:
+  - name: "Technical Differentiation"
+    weight: 35
+    guidance: |
+      Product should have defensible technical advantage.
+      Assess IP, proprietary data, or unique approach.
+    required: true
+
+  - name: "Product-Market Fit Evidence"
+    weight: 35
+    guidance: |
+      For seed: Clear evidence customers will pay and use product.
+      For Series A: Proven PMF with metrics (retention, engagement, NPS).
+    required: true
+
+  - name: "Scalability"
+    weight: 20
+    guidance: |
+      Architecture should support 10-100x growth without major rewrites.
+      Assess technical debt and engineering velocity.
+    required: false
+
+  - name: "Roadmap Clarity"
+    weight: 10
+    guidance: |
+      Clear product vision and 12-18 month roadmap.
+      Prioritization aligns with market needs.
+    required: false
+
+# Financial Metrics Criteria
+financial_criteria:
+  - name: "Revenue (Series A+)"
+    weight: 30
+    guidance: "For Series A, prefer $1M+ ARR. For Series B, $5M+ ARR."
+    threshold: 1000000
+    required: false  # Not required for seed
+
+  - name: "LTV:CAC Ratio"
+    weight: 25
+    guidance: |
+      Target 3:1 or better at Series A.
+      Seed stage: Look for path to healthy unit economics.
+    threshold: 3.0
+    required: false
+
+  - name: "Gross Margin"
+    weight: 20
+    guidance: |
+      SaaS should target 70%+ gross margins.
+      Marketplace/Fintech: 40-60% acceptable.
+    threshold: 70.0
+    required: false
+
+  - name: "Burn Multiple"
+    weight: 15
+    guidance: |
+      Net Burn / Net New ARR. Target <1.5x.
+      Lower is better (more capital efficient).
+    threshold: 1.5
+    required: false
+
+  - name: "Runway"
+    weight: 10
+    guidance: "Minimum 12 months runway post-investment."
+    threshold: 12.0
+    required: true
+
+# Traction Metrics Criteria
+traction_criteria:
+  - name: "Revenue Growth Rate"
+    weight: 35
+    guidance: |
+      Seed: 3x+ YoY growth.
+      Series A: 2.5x+ YoY growth.
+      Series B+: 100%+ YoY growth.
+    required: true
+
+  - name: "Customer Retention"
+    weight: 30
+    guidance: |
+      Net Dollar Retention >100% is strong signal.
+      Gross Retention >85% for B2B SaaS.
+    threshold: 85.0
+    required: false
+
+  - name: "Customer Concentration"
+    weight: 20
+    guidance: |
+      No single customer >25% of revenue at Series A.
+      Diversified customer base reduces risk.
+    threshold: 25.0
+    required: false
+
+  - name: "Sales Efficiency"
+    weight: 15
+    guidance: |
+      CAC payback period <12 months ideal.
+      Magic Number >0.75 for SaaS.
+    threshold: 0.75
+    required: false
+
+# Red Flags and Deal-Breakers
+red_flags:
+  - name: "Founder Departure"
+    severity: "blocking"
+    description: "Founding team member left within last 6 months"
+    exceptions: "Amicable departure with clear succession plan"
+
+  - name: "Excessive Customer Concentration"
+    severity: "blocking"
+    description: ">50% revenue from single customer at Series A+"
+    exceptions: "Clear plan to diversify with enterprise customer pipeline"
+
+  - name: "Undisclosed Litigation"
+    severity: "blocking"
+    description: "Material litigation not disclosed upfront"
+    exceptions: null
+
+  - name: "IP Disputes"
+    severity: "blocking"
+    description: "Unresolved IP ownership or infringement issues"
+    exceptions: "Minor disputes with clear resolution path and legal opinion"
+
+  - name: "Unrealistic Projections"
+    severity: "concerning"
+    description: "Projections >3x historical growth without strong justification"
+    exceptions: "Supported by new product launch, market expansion, or proven playbook"
+
+  - name: "High Burn Rate"
+    severity: "concerning"
+    description: "Burn Multiple >2.5x without path to efficiency"
+    exceptions: "Clear plan to improve efficiency with specific milestones"
+
+  - name: "Regulatory Risk"
+    severity: "concerning"
+    description: "High regulatory risk without compliance expertise"
+    exceptions: "Team includes regulatory experts and compliance strategy"
+
+  - name: "Previous Down Round"
+    severity: "warning"
+    description: "Raised down round within last 12 months"
+    exceptions: "Clear turnaround story with metrics supporting recovery"
+
+# Agent-Specific Configuration
+agent_config:
+  supervisor:
+    model: "gpt-4o"
+    temperature: 0.3
+    max_tokens: 4096
+
+  market_analysis:
+    model: "gpt-4o"
+    temperature: 0.5
+    max_tokens: 8192
+    search_enabled: true
+    max_search_results: 10
+
+  financial_analysis:
+    model: "gpt-4o"
+    temperature: 0.2
+    max_tokens: 8192
+    require_calculations: true
+
+  technical_assessment:
+    model: "gpt-4o"
+    temperature: 0.4
+    max_tokens: 6144
+
+  team_evaluation:
+    model: "gpt-4o"
+    temperature: 0.4
+    max_tokens: 6144
+
+  portfolio_tracking:
+    model: "gpt-4o-mini"
+    temperature: 0.2
+    max_tokens: 4096
+    collection_frequency: "monthly"
+
+# Output Preferences
+output_preferences:
+  executive_summary_max_paragraphs: 3
+  include_scenarios: true
+  confidence_indicators: true
+  require_citations: true
+  visualization_format: "markdown"
+
+# Human-in-the-Loop Configuration
+human_review_required_for:
+  - "investment_recommendation"
+  - "high_severity_red_flag"
+  - "valuation_above_threshold"
+  - "follow_on_investment"
+  - "portfolio_company_intervention"

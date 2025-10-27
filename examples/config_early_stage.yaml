@@ -1,0 +1,221 @@
+# Investment Thesis Configuration - Early-Stage Fund
+# Example configuration for a pre-seed/seed focused fund
+
+config_version: "1.0.0"
+firm_name: "Catalyst Ventures"
+created_date: "2025-01-15"
+last_updated: "2025-01-15"
+
+stage_preferences:
+  - name: "pre-seed"
+    min_check_size: 250000
+    max_check_size: 750000
+    target_ownership: 12.0
+    priority: 1
+
+  - name: "seed"
+    min_check_size: 750000
+    max_check_size: 2500000
+    target_ownership: 15.0
+    priority: 1
+
+sector_preferences:
+  - name: "Developer Tools"
+    expertise_level: "high"
+    specific_guidance: |
+      Look for strong developer adoption signals (GitHub stars, community engagement).
+      Product-led growth essential. Focus on developer pain points.
+    sub_sectors:
+      - "DevOps & Infrastructure"
+      - "API & Integration Tools"
+      - "Security Tools"
+      - "Data Infrastructure"
+
+  - name: "B2B SaaS"
+    expertise_level: "high"
+    specific_guidance: "Vertical SaaS with clear wedge. PLG motion preferred."
+    sub_sectors:
+      - "Vertical SaaS"
+      - "Workflow Automation"
+      - "Collaboration Tools"
+
+  - name: "AI/ML Infrastructure"
+    expertise_level: "moderate"
+    specific_guidance: "Evaluate moat carefully. Prefer infrastructure over applications."
+    sub_sectors:
+      - "ML Ops"
+      - "Vector Databases"
+      - "AI Developer Tools"
+
+geographic_scope:
+  - "United States"
+  - "Canada"
+
+fund_strategy:
+  fund_size: 50000000
+  deployment_target_years: 3
+  reserve_ratio: 0.40
+  target_portfolio_size: 40
+  concentration_strategy: "diversified"
+
+team_criteria:
+  - name: "Founder-Market Fit"
+    weight: 50
+    guidance: |
+      Critical at pre-seed/seed. Founders must have deep domain expertise
+      or lived experience with the problem. Look for 3+ years in the space.
+    required: true
+
+  - name: "Technical Co-Founder"
+    weight: 40
+    guidance: "At least one technical co-founder required for all deals"
+    required: true
+
+  - name: "Resilience & Grit"
+    weight: 10
+    guidance: "Evidence of overcoming obstacles or previous startup experience"
+    required: false
+
+market_criteria:
+  - name: "TAM Size"
+    weight: 25
+    guidance: "Minimum $500M TAM at pre-seed, $1B+ at seed"
+    threshold: 500000000
+    required: true
+
+  - name: "Market Timing"
+    weight: 35
+    guidance: |
+      Critical for early stage. Why now? What changed to enable this?
+      Look for technology shifts, regulatory changes, or behavior changes.
+    required: true
+
+  - name: "Early Adopter Presence"
+    weight: 25
+    guidance: "Evidence of early adopters willing to try new solutions"
+    required: true
+
+  - name: "Market Growth"
+    weight: 15
+    guidance: "Prefer 15%+ growth but not required if timing is right"
+    threshold: 15.0
+    required: false
+
+product_criteria:
+  - name: "Product-Market Fit Evidence"
+    weight: 45
+    guidance: |
+      For pre-seed: Initial customer validation, LOIs, design partners
+      For seed: Clear PMF signals - retention, engagement, organic growth
+    required: true
+
+  - name: "Unique Insight or Approach"
+    weight: 35
+    guidance: "Non-obvious insight about the market or unique technical approach"
+    required: true
+
+  - name: "Minimum Viable Product"
+    weight: 20
+    guidance: |
+      Pre-seed: Working prototype acceptable
+      Seed: Product in market with real users
+    required: true
+
+financial_criteria:
+  - name: "Revenue (Seed)"
+    weight: 20
+    guidance: "Prefer some revenue at seed ($100K+ ARR) but not required if other signals strong"
+    threshold: 100000
+    required: false
+
+  - name: "Path to Unit Economics"
+    weight: 40
+    guidance: |
+      Don't require positive unit economics yet, but must show clear path.
+      Understand customer acquisition and monetization strategy.
+    required: true
+
+  - name: "Burn Rate"
+    weight: 20
+    guidance: "Efficiency matters even early. Prefer capital-efficient teams."
+    required: false
+
+  - name: "Runway Post-Investment"
+    weight: 20
+    guidance: "Must have 18+ months runway after investment"
+    threshold: 18.0
+    required: true
+
+traction_criteria:
+  - name: "User/Customer Growth"
+    weight: 35
+    guidance: |
+      Pre-seed: Evidence of customer interest (waitlist, LOIs, pilot users)
+      Seed: Actual users/customers with growth trajectory
+    required: true
+
+  - name: "Product Engagement"
+    weight: 30
+    guidance: |
+      For PLG: DAU/MAU, feature usage, retention cohorts
+      For sales-led: Demo-to-trial, trial-to-paid conversion
+    required: true
+
+  - name: "Community or Network Effects"
+    weight: 20
+    guidance: "For developer tools: GitHub stars, community engagement, word-of-mouth"
+    required: false
+
+  - name: "Revenue Growth"
+    weight: 15
+    guidance: "If revenue exists, look for 3x+ monthly growth"
+    required: false
+
+red_flags:
+  - name: "Lack of Domain Expertise"
+    severity: "blocking"
+    description: "Founders without relevant industry or technical expertise"
+    exceptions: "Exceptional team from adjacent domain with rapid learning"
+
+  - name: "Large Incumbent Advantage"
+    severity: "concerning"
+    description: "Going head-to-head with major incumbent without clear differentiation"
+    exceptions: "Significant technology shift or regulatory change enabling disruption"
+
+  - name: "Team Conflicts"
+    severity: "blocking"
+    description: "Evidence of co-founder disputes or instability"
+
+  - name: "No Technical Differentiation"
+    severity: "concerning"
+    description: "Easy to replicate product with no moat"
+    exceptions: "Strong network effects or go-to-market advantage"
+
+  - name: "Unclear Problem"
+    severity: "concerning"
+    description: "Solution looking for a problem, no clear customer pain"
+
+agent_config:
+  supervisor:
+    model: "claude-3-5-sonnet-20241022"
+    temperature: 0.4
+
+  market_analysis:
+    model: "gpt-4o"
+    temperature: 0.5
+    search_enabled: true
+    max_search_results: 10
+
+  team_evaluation:
+    model: "claude-3-5-sonnet-20241022"
+    temperature: 0.4
+
+output_preferences:
+  executive_summary_max_paragraphs: 2
+  include_scenarios: true
+  confidence_indicators: true
+  require_citations: true
+
+human_review_required_for:
+  - "investment_recommendation"
+  - "high_severity_red_flag"

@@ -1,0 +1,193 @@
+# Investment Thesis Configuration - Fintech-Focused Fund
+# Example configuration for a fund specializing in financial technology
+
+config_version: "1.0.0"
+firm_name: "FinTech Growth Partners"
+created_date: "2025-01-15"
+last_updated: "2025-01-15"
+
+stage_preferences:
+  - name: "series-a"
+    min_check_size: 3000000
+    max_check_size: 15000000
+    target_ownership: 15.0
+    priority: 1
+
+  - name: "series-b"
+    min_check_size: 10000000
+    max_check_size: 30000000
+    target_ownership: 10.0
+    priority: 2
+
+sector_preferences:
+  - name: "Fintech"
+    expertise_level: "high"
+    specific_guidance: |
+      Prioritize regulatory compliance and banking partnerships.
+      Assess regulatory risk thoroughly - require legal/compliance expertise on team.
+      Focus on B2B fintech, embedded finance, and infrastructure.
+    sub_sectors:
+      - "Payment Infrastructure"
+      - "Embedded Fintech"
+      - "Banking-as-a-Service"
+      - "Lending Infrastructure"
+      - "RegTech"
+
+  - name: "SaaS"
+    expertise_level: "moderate"
+    specific_guidance: "Only if fintech-adjacent (e.g., accounting, treasury, finance software)"
+    sub_sectors:
+      - "Financial Operations Software"
+      - "Treasury Management"
+
+  - name: "Consumer Fintech"
+    expertise_level: "avoid"
+    specific_guidance: "Generally avoid consumer lending and neobanks unless exceptional team and metrics"
+
+geographic_scope:
+  - "United States"
+  - "United Kingdom"
+
+fund_strategy:
+  fund_size: 200000000
+  deployment_target_years: 3
+  reserve_ratio: 0.60
+  target_portfolio_size: 20
+  concentration_strategy: "concentrated"
+
+team_criteria:
+  - name: "Financial Services Experience"
+    weight: 50
+    guidance: "Team must include members with 5+ years in banking, payments, or financial services"
+    required: true
+
+  - name: "Regulatory Expertise"
+    weight: 30
+    guidance: "Legal/compliance expertise required on team or advisory board"
+    required: true
+
+  - name: "Technical Depth"
+    weight: 20
+    guidance: "Strong engineering team capable of handling financial infrastructure"
+    required: true
+
+market_criteria:
+  - name: "Regulatory Clarity"
+    weight: 35
+    guidance: "Clear regulatory path and compliance strategy. Avoid uncertain regulatory environments."
+    required: true
+
+  - name: "Banking Partnerships"
+    weight: 30
+    guidance: "Evidence of bank partnerships or clear path to acquiring them"
+    required: true
+
+  - name: "TAM Size"
+    weight: 20
+    guidance: "Minimum $5B TAM for Series A in fintech infrastructure"
+    threshold: 5000000000
+    required: true
+
+  - name: "Market Timing"
+    weight: 15
+    guidance: "Assess regulatory timing and bank appetite for partnerships"
+    required: true
+
+product_criteria:
+  - name: "Compliance & Security"
+    weight: 40
+    guidance: "Must demonstrate SOC 2, PCI-DSS, or equivalent compliance roadmap"
+    required: true
+
+  - name: "Banking Integration"
+    weight: 30
+    guidance: "Product must integrate with banking infrastructure or payment rails"
+    required: true
+
+  - name: "Scalability"
+    weight: 30
+    guidance: "Infrastructure must handle financial transaction volumes and uptime requirements"
+    required: true
+
+financial_criteria:
+  - name: "Revenue (Series A+)"
+    weight: 35
+    guidance: "Minimum $3M ARR for Series A fintech companies"
+    threshold: 3000000
+    required: true
+
+  - name: "Gross Margin"
+    weight: 25
+    guidance: "Target 50%+ gross margins (lower acceptable for payment infrastructure)"
+    threshold: 50.0
+    required: false
+
+  - name: "Customer Retention"
+    weight: 20
+    guidance: "Critical for fintech - need 90%+ net dollar retention"
+    threshold: 90.0
+    required: true
+
+  - name: "Regulatory Capital Requirements"
+    weight: 20
+    guidance: "Assess capital requirements for licenses and regulatory compliance"
+    required: true
+
+traction_criteria:
+  - name: "Banking/Enterprise Customers"
+    weight: 40
+    guidance: "Signed contracts with banks or enterprise customers"
+    required: true
+
+  - name: "Transaction Volume Growth"
+    weight: 30
+    guidance: "Track transaction volume growth as key metric"
+    required: true
+
+  - name: "Compliance Milestones"
+    weight: 30
+    guidance: "Progress on regulatory licenses and compliance certifications"
+    required: true
+
+red_flags:
+  - name: "Regulatory Uncertainty"
+    severity: "blocking"
+    description: "Unclear regulatory status or high risk of adverse regulation"
+
+  - name: "No Banking Partners"
+    severity: "blocking"
+    description: "Series A+ companies without bank partnerships or clear path"
+
+  - name: "Consumer Lending Focus"
+    severity: "concerning"
+    description: "Consumer lending model without exceptional unit economics"
+    exceptions: "Underwriting advantage, proprietary data, or proven track record"
+
+  - name: "Inadequate Security"
+    severity: "blocking"
+    description: "Insufficient security posture for handling financial data"
+
+agent_config:
+  supervisor:
+    model: "gpt-4o"
+    temperature: 0.2
+
+  market_analysis:
+    model: "gpt-4o"
+    temperature: 0.3
+    search_enabled: true
+
+  financial_analysis:
+    model: "gpt-4o"
+    temperature: 0.2
+
+output_preferences:
+  executive_summary_max_paragraphs: 3
+  include_scenarios: true
+  confidence_indicators: true
+  require_citations: true
+
+human_review_required_for:
+  - "investment_recommendation"
+  - "high_severity_red_flag"
+  - "regulatory_risk_assessment"
