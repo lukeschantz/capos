@@ -1,491 +1,582 @@
-# VC Digital Twin: Multi-Agent Investment Evaluation System
+# Capital OS - Intelligence & Orchestration Platform
 
-A comprehensive multi-agent AI system that transforms venture capital operations by orchestrating specialized agents for investment research, due diligence, and portfolio monitoring. Built with LangGraph's supervisor-worker pattern, this system enables VC firms to scale their analytical capabilities while maintaining thesis-specific customization.
+> **AI-native modular platform** for building self-evolving organizational intelligence
 
-## Overview
+Capital OS transforms specifications, notes, and data into actionable intelligence through modular micro-UIs, multi-agent orchestration, and knowledge graph infrastructure. Built for rapid prototyping and production deployment.
 
-The VC Digital Twin employs a **hierarchical supervisor-worker architecture** where a central Supervisor Agent orchestrates specialized worker teams across three domains:
-
-- **Research Agents**: Market Analysis, Competitor Intelligence, Industry Research
-- **Due Diligence Agents**: Financial Analysis, Technical Assessment, Team Evaluation, Legal Review
-- **Portfolio Management Agents**: Performance Tracking, Milestone Monitoring, Portfolio Support
-
-Each agent uses chain-of-thought reasoning with configurable prompts that adapt to any VC firm's investment thesis, stage focus, and sector preferences.
-
-## Key Features
-
-- **Thesis-Driven Customization**: Configure evaluation criteria, stage preferences, sector expertise, and red flags via YAML
-- **Intelligent Orchestration**: Supervisor agent dynamically routes tasks to specialized workers
-- **Deep Reasoning**: Agents employ structured chain-of-thought with explicit calculations and citations
-- **Production-Ready**: Built on LangGraph with checkpointing, error handling, and audit trails
-- **Multi-LLM Support**: Works with OpenAI (GPT-4o), Anthropic (Claude), or Google (Gemini)
-- **Extensible**: Modular design enables easy addition of new agents and tools
-
-## System Architecture
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                   Supervisor Agent                      │
-│        (Coordination & Routing Logic)                   │
-└─────────────────────────────────────────────────────────┘
-                          │
-        ┌─────────────────┼─────────────────┐
-        │                 │                 │
-        ▼                 ▼                 ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│   Research   │  │     Due      │  │  Portfolio   │
-│    Agents    │  │  Diligence   │  │ Management   │
-│              │  │   Agents     │  │   Agents     │
-│ • Market     │  │ • Financial  │  │ • Tracking   │
-│ • Competitor │  │ • Technical  │  │ • Milestones │
-│ • Industry   │  │ • Team       │  │ • Support    │
-│              │  │ • Legal      │  │              │
-└──────────────┘  └──────────────┘  └──────────────┘
-        │                 │                 │
-        └─────────────────┴─────────────────┘
-                          │
-                          ▼
-              ┌─────────────────────┐
-              │   Shared State      │
-              │  (Messages, Data,   │
-              │  Audit Trail)       │
-              └─────────────────────┘
-```
-
-## Current Implementation Status
-
-**Phase 1: Foundation & Single-Agent Prototype** ✅ COMPLETE
-
-- ✅ Core StateGraph with comprehensive state schema
-- ✅ Supervisor Agent with intelligent routing
-- ✅ Market Analysis Agent (first worker)
-- ✅ Configuration system for investment thesis
-- ✅ Prompt templates with COSTAR framework
-- ✅ Web search & calculator tools
-- ✅ CLI interface for testing
-- ✅ Checkpointing infrastructure
-
-**Phase 2: Complete Due Diligence Agent Set** 🚧 PLANNED
-
-- Financial Analysis Agent
-- Technical Assessment Agent
-- Team Evaluation Agent
-- Legal Review Agent
-- Parallel agent execution
-- Comprehensive test suite
-
-**Phase 3: Portfolio Monitoring** 🚧 PLANNED
-**Phase 4: Production Deployment** 🚧 PLANNED
-
-## Installation
-
-### Prerequisites
-
-- Python 3.10 or higher
-- API key for at least one LLM provider (OpenAI, Anthropic, or Google)
-- (Optional) Tavily API key for web search
-- (Optional) PostgreSQL for persistent checkpointing
-
-### Setup
-
-1. **Clone the repository**
-```bash
-git clone <repository-url>
-cd capos
-```
-
-2. **Create a virtual environment**
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies**
-```bash
-pip install -r requirements.txt
-```
-
-4. **Configure environment variables**
-```bash
-cp .env.example .env
-# Edit .env and add your API keys
-```
-
-Required environment variables:
-```bash
-# At least one LLM provider
-OPENAI_API_KEY=sk-...
-# OR
-ANTHROPIC_API_KEY=sk-ant-...
-
-# Optional but recommended
-TAVILY_API_KEY=tvly-...  # For web search
-LANGSMITH_API_KEY=...     # For monitoring
-```
-
-5. **Review and customize configuration**
-```bash
-# Edit the investment thesis configuration
-nano config/investment_thesis.yaml
-```
-
-## Quick Start
-
-### Evaluate a Company
-
-```bash
-# Basic evaluation
-python cli.py evaluate --company "Acme Corp"
-
-# With sector and stage
-python cli.py evaluate --company "TechCo" --sector SaaS --stage seed
-
-# With custom focus
-python cli.py evaluate --company "FinTech Inc" --query "Focus on unit economics and regulatory risk"
-```
-
-### View Configuration
-
-```bash
-python cli.py config
-```
-
-## Usage Examples
-
-### Programmatic Usage
-
-```python
-from src.graph import get_graph
-from src.state.schema import create_initial_state, InvestmentContext
-
-# Create the graph
-graph = get_graph()
-
-# Configure your investment thesis
-investment_context = InvestmentContext()
-
-# Create initial state
-state = create_initial_state(
-    user_query="Evaluate this SaaS company for Series A investment",
-    company_name="Example Corp",
-    investment_context=investment_context,
-)
-
-# Add company details
-state["company_data"]["sector"] = "SaaS"
-state["company_data"]["stage"] = "series-a"
-
-# Run the evaluation
-config = {"configurable": {"thread_id": "eval-001"}}
-result = graph.invoke(state, config=config)
-
-# Access findings
-market_analysis = result["market_data"]
-due_diligence = result["due_diligence"]
-```
-
-### Streaming Execution
-
-```python
-# Stream for real-time updates
-for event in graph.stream(state, config=config, stream_mode="values"):
-    messages = event.get("messages", [])
-    if messages:
-        print(messages[-1].content)
-```
-
-### With Checkpointing
-
-```python
-from src.graph import get_graph
-
-# Use PostgreSQL checkpointing for production
-graph = get_graph(use_postgres=True, database_url="postgresql://...")
-
-# Run with checkpointing
-config = {"configurable": {"thread_id": "investment-eval-001"}}
-result = graph.invoke(state, config=config)
-
-# Later, resume from checkpoint
-saved_state = graph.get_state(config)
-# Continue execution...
-```
-
-## Configuration
-
-### Investment Thesis Customization
-
-The system adapts to your firm's specific investment approach through `config/investment_thesis.yaml`:
-
-```yaml
-# Stage preferences
-stage_preferences:
-  - name: "seed"
-    min_check_size: 500000
-    max_check_size: 2000000
-    target_ownership: 15.0
-    priority: 1
-
-# Sector expertise
-sector_preferences:
-  - name: "SaaS"
-    expertise_level: "high"
-    specific_guidance: "Focus on Rule of 40 trajectory..."
-
-# Evaluation criteria with weights
-market_criteria:
-  - name: "TAM Size"
-    weight: 30
-    threshold: 1000000000
-    required: true
-    guidance: "Minimum $1B TAM for seed stage..."
-
-# Red flags and deal-breakers
-red_flags:
-  - name: "Founder Departure"
-    severity: "blocking"
-    description: "Founding team member left within last 6 months"
-```
-
-See `config/investment_thesis.yaml` for the complete schema.
-
-## Project Structure
-
-```
-capos/
-├── src/
-│   ├── agents/          # Agent implementations
-│   │   ├── supervisor.py       # Supervisor coordinator
-│   │   └── market_analysis.py  # Market analysis agent
-│   ├── config/          # Configuration management
-│   │   └── loader.py           # Config loader with Pydantic validation
-│   ├── prompts/         # Prompt templates
-│   │   └── templates.py        # COSTAR-based prompts
-│   ├── state/           # State management
-│   │   └── schema.py           # TypedDict state schema
-│   ├── tools/           # Agent tools
-│   │   └── search.py           # Web search & calculator tools
-│   └── graph.py         # Main StateGraph definition
-├── config/              # Configuration files
-│   └── investment_thesis.yaml  # Investment thesis config
-├── tests/               # Test suite
-├── examples/            # Example scripts
-├── cli.py              # Command-line interface
-├── requirements.txt    # Python dependencies
-└── README.md          # This file
-```
-
-## Development
-
-### Running Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=src tests/
-
-# Run specific test file
-pytest tests/test_supervisor.py
-```
-
-### Code Quality
-
-```bash
-# Format code
-black src/ tests/
-
-# Lint code
-ruff check src/ tests/
-
-# Type checking
-mypy src/
-```
-
-### Adding New Agents
-
-1. Create agent file in `src/agents/your_agent.py`
-2. Implement agent using ReAct pattern or custom logic
-3. Add prompt template in `src/prompts/templates.py`
-4. Register agent in `src/graph.py`
-5. Update supervisor to route to new agent
-6. Add tests in `tests/agents/test_your_agent.py`
-
-Example:
-```python
-# src/agents/your_agent.py
-from langgraph.prebuilt import create_react_agent
-from src.state.schema import VCDigitalTwinState
-
-class YourAgent:
-    def __init__(self, config):
-        self.config = config
-        # Initialize LLM, tools, etc.
-
-    def __call__(self, state: VCDigitalTwinState):
-        # Agent logic
-        # Return Command with routing and updates
-        pass
-```
-
-## Roadmap
-
-### Phase 2: Complete Due Diligence (Q2 2025)
-- [ ] Financial Analysis Agent
-- [ ] Technical Assessment Agent
-- [ ] Team Evaluation Agent
-- [ ] Legal Review Agent
-- [ ] Parallel agent execution
-- [ ] Comprehensive test coverage
-
-### Phase 3: Portfolio Monitoring (Q3 2025)
-- [ ] Performance Tracking Agent
-- [ ] Milestone Monitoring Agent
-- [ ] Portfolio Support Agent
-- [ ] Automated data collection
-- [ ] Portfolio dashboards
-
-### Phase 4: Production Deployment (Q4 2025)
-- [ ] Web interface
-- [ ] CRM integrations (Affinity, Harmonic)
-- [ ] Advanced security & compliance
-- [ ] Multi-tenant support
-- [ ] LP reporting automation
-
-## Technical Details
-
-### LangGraph Implementation
-
-The system uses LangGraph's latest patterns:
-
-- **StateGraph**: Type-safe state management with reducers
-- **Command**: Dynamic routing with simultaneous state updates
-- **create_react_agent**: Pre-built ReAct pattern for workers
-- **Checkpointing**: State persistence for fault tolerance
-- **Streaming**: Real-time execution monitoring
-
-### State Management
-
-State uses TypedDict with annotated reducers:
-
-```python
-class VCDigitalTwinState(TypedDict):
-    messages: Annotated[List[AnyMessage], add_messages]  # Auto-appends
-    company_data: CompanyData
-    financial_data: FinancialData
-    market_data: MarketData
-    # ... other fields
-```
-
-### Agent Coordination
-
-Supervisor uses structured output for routing:
-
-```python
-class SupervisorDecision(BaseModel):
-    next: str  # Agent name or "FINISH"
-    reasoning: str
-    task_description: str
-
-# Supervisor returns Command for routing
-return Command(goto=agent_name, update=state_updates)
-```
-
-## Performance & Costs
-
-### Token Usage
-
-- Typical market analysis: 5,000-10,000 tokens
-- Complete due diligence: 30,000-50,000 tokens
-- Cost per evaluation: $0.50-$2.00 (depending on model)
-
-### Execution Time
-
-- Market analysis only: 30-60 seconds
-- Full due diligence: 3-5 minutes
-- Portfolio monitoring: 1-2 minutes per company
-
-### Optimization Tips
-
-- Use GPT-4o-mini or Claude Haiku for simple tasks
-- Enable caching for repeated analyses
-- Batch portfolio monitoring operations
-- Use PostgreSQL checkpointing in production
-
-## Troubleshooting
-
-### Common Issues
-
-**Import errors:**
-```bash
-# Ensure src is in Python path
-export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-```
-
-**API key errors:**
-```bash
-# Verify .env file exists and has valid keys
-cat .env | grep API_KEY
-```
-
-**Config not found:**
-```bash
-# Check config file exists
-ls config/investment_thesis.yaml
-# Verify CONFIG_PATH environment variable
-echo $CONFIG_PATH
-```
-
-**Graph execution errors:**
-Enable debug mode:
-```python
-import logging
-logging.basicConfig(level=logging.DEBUG)
-```
-
-## Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
-
-## License
-
-[Your License Here]
-
-## Citation
-
-If you use this system in your research or practice, please cite:
-
-```bibtex
-@software{vc_digital_twin,
-  title = {VC Digital Twin: Multi-Agent Investment Evaluation System},
-  author = {Your Name},
-  year = {2025},
-  url = {https://github.com/your-repo}
-}
-```
-
-## Support
-
-- Documentation: [docs/](docs/)
-- Issues: [GitHub Issues](https://github.com/your-repo/issues)
-- Discussions: [GitHub Discussions](https://github.com/your-repo/discussions)
-
-## Acknowledgments
-
-This system implements patterns and best practices from:
-
-- Anthropic's multi-agent system guidelines
-- LangGraph documentation and examples
-- Established VC due diligence frameworks
-- Production multi-agent deployments
+![Capital OS Architecture](https://img.shields.io/badge/Status-Strawman%20Prototype-blue)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![LangGraph](https://img.shields.io/badge/LangGraph-Multi--Agent-green)
 
 ---
 
-**Built with LangGraph** | **Powered by Claude & GPT-4** | **Designed for VC Excellence**
+## 🎯 What is Capital OS?
+
+Capital OS is a **modular Intelligence & Orchestration platform** where:
+
+- **Knowledge evolves**: Notes → AI analysis → Deterministic code → Hardware optimization
+- **Agents orchestrate**: Multi-agent systems (LangGraph) handle complex workflows
+- **Modules compose**: Self-contained micro-UIs for each capability
+- **Specifications drive**: GitOps-style company-as-code approach
+- **Intelligence graduates**: Information gets smarter and more cost-effective over time
+
+**Philosophy**: Build fast, learn faster. This is a functional strawman designed for rapid iteration.
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│           Next.js Frontend (Vercel)                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐             │
+│  │ VC Twin  │  │  Notes   │  │  Specs   │  ...        │
+│  │ Micro UI │  │ Micro UI │  │ Micro UI │             │
+│  └──────────┘  └──────────┘  └──────────┘             │
+└─────────────────────┬───────────────────────────────────┘
+                      │ HTTP/WebSocket
+┌─────────────────────▼───────────────────────────────────┐
+│          MCP Server (Fast MCP - Python)                 │
+│  Resources  │  Tools  │  Prompts  │  Workflows         │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│         LangGraph Multi-Agent System                    │
+│  Supervisor → Market Analysis → Due Diligence → ...    │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│  Infrastructure: Supabase, Neo4j, Vercel, Vector DB    │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Node.js** 18+ and npm
+- **Python** 3.10+
+- **API Key**: OpenAI or Anthropic
+
+### Get Started in 3 Commands
+
+```bash
+# 1. Setup everything
+./scripts/setup.sh
+
+# 2. Add your API key to .env
+echo "OPENAI_API_KEY=sk-your-key-here" >> .env
+
+# 3. Start the platform
+npm run dev
+```
+
+**Access Points:**
+- 🌐 **Platform Home**: http://localhost:3000
+- 💼 **VC Digital Twin**: http://localhost:3000/modules/vc-digital-twin
+- 🤖 **MCP Server**: http://localhost:8000
+
+### First Test
+
+1. Open http://localhost:3000/modules/vc-digital-twin
+2. Enter a company name: "Stripe", "OpenAI", "Anthropic"
+3. Watch the multi-agent system analyze it in real-time!
+
+---
+
+## 📦 Modules
+
+### 1. VC Digital Twin ✅ **Active**
+
+**Multi-agent investment evaluation system with LangGraph supervisor-worker pattern**
+
+**Features:**
+- 🔍 **Market Analysis Agent**: TAM, growth rate, competitive landscape
+- 🏢 **Due Diligence Workflows**: Financial, technical, team, legal (Phase 2)
+- 📊 **Portfolio Monitoring**: Performance tracking and insights (Phase 3)
+- ⚙️ **Investment Thesis Customization**: YAML-based configuration
+- 📈 **Real-time Agent Status**: Watch agents work through the UI
+
+**Current Status:**
+- ✅ Supervisor agent with intelligent routing
+- ✅ Market analysis agent operational
+- ✅ Web search & calculator tools integrated
+- ✅ Investment thesis configuration system
+- 🚧 Financial, technical, team, legal agents (Phase 2)
+
+**Tech:** LangGraph, Claude/GPT-4, Tavily Search, COSTAR prompting
+
+**Location:** `/modules/vc-digital-twin`
+
+---
+
+### 2. Note Intelligence 🚧 **Planned**
+
+**Capture knowledge from notes and graduate it through intelligence tiers**
+
+**Planned Features:**
+- 📸 **Capture**: Camera + upload with OCR (Tesseract.js / Google Vision)
+- 🧠 **Classification**: Tier intelligence (Foundation LLM → SLM → Deterministic → Hardware)
+- 📊 **Significance Scoring**: Automatically prioritize important information
+- 🎓 **Graduation Pipeline**: Move knowledge down the cost curve
+- 🔗 **Knowledge Graph**: Connect insights in Neo4j
+
+**Graduation Path:**
+```
+Foundation Model (Claude Opus) → Cost: $$$
+    ↓ Extract patterns, create rules
+Small Language Model (Llama 3) → Cost: $$
+    ↓ Identify deterministic logic
+Rule Engine (Python/TypeScript) → Cost: $
+    ↓ Compile critical paths
+FPGA/Hardware → Cost: ¢
+```
+
+**Location:** `/modules/note-intelligence`
+
+---
+
+### 3. Specification Orchestrator 📋 **Planned**
+
+**Company-as-code: GitOps for organizational workflows**
+
+**Planned Features:**
+- 📝 Define company principles, workflows, agents in YAML/JSON
+- 🔄 GitOps: Version control for organizational intelligence
+- 🚀 Auto-execution: Specs trigger workflows and agent actions
+- 🔍 Validation: Schema checking for specifications
+- 📊 Impact tracking: See how specs affect operations
+
+**Location:** `/modules/spec-orchestrator`
+
+---
+
+### 4. Agent Control Manager 📋 **Planned**
+
+**Monitor, govern, and audit AI agent operations**
+
+**Planned Features:**
+- 📊 Agent registry and capability mapping
+- 👁️ Real-time observability (OpenTelemetry)
+- 💰 Cost tracking per agent/workflow
+- 🔒 Policy engine and compliance tracking
+- 📝 Complete audit logs
+
+**Location:** `/modules/agent-control`
+
+---
+
+### 5. Intelligence Dashboard 📋 **Planned**
+
+**Real-time metrics and optimization insights**
+
+**Planned Features:**
+- 💰 Cost savings from intelligence graduation
+- 📊 Intelligence tier distribution
+- ⚡ Processing queue metrics
+- 🔍 Pattern detection and anomalies
+- 💡 Optimization recommendations
+
+**Location:** `/modules/intelligence-dashboard`
+
+---
+
+### 6. Knowledge Graph Builder 📋 **Planned**
+
+**Self-evolving organizational knowledge graph with hybrid RAG**
+
+**Planned Features:**
+- 🗺️ Neo4j graph database
+- 🔍 Hybrid vector + graph search
+- 🤖 Auto-construction from notes and specs
+- ⛏️ Pattern mining and optimization
+- 🧠 RAG pipeline for context-aware answers
+
+**Location:** `/modules/knowledge-graph`
+
+---
+
+## 📁 Project Structure
+
+```
+capos/
+├── frontend/                 # Next.js 14 frontend
+│   ├── app/
+│   │   ├── modules/         # Module pages
+│   │   │   └── vc-digital-twin/
+│   │   ├── page.tsx         # Home with module gallery
+│   │   └── layout.tsx
+│   ├── components/ui/       # shadcn/ui components
+│   └── lib/                 # Utilities
+│
+├── modules/                  # Self-contained module components
+│   ├── vc-digital-twin/     # VC module UI
+│   │   └── index.tsx
+│   ├── note-intelligence/   # (Planned)
+│   └── registry.ts          # Module definitions
+│
+├── backend/
+│   └── mcp-server/          # Fast MCP server
+│       ├── server.py        # Wraps LangGraph agents
+│       └── requirements.txt
+│
+├── src/                      # LangGraph agents (existing)
+│   ├── agents/
+│   │   ├── supervisor.py
+│   │   └── market_analysis.py
+│   ├── graph.py             # StateGraph definition
+│   ├── state/
+│   │   └── schema.py
+│   ├── config/
+│   │   └── loader.py
+│   └── tools/
+│
+├── config/
+│   └── investment_thesis.yaml  # VC thesis configuration
+│
+├── scripts/
+│   ├── setup.sh             # One-time setup
+│   └── quick-start.sh       # Start servers
+│
+├── tests/                    # Test suite
+│   ├── agents/
+│   └── integration/
+│
+├── package.json              # Monorepo scripts
+└── README.md                 # This file
+```
+
+---
+
+## 🛠️ Development
+
+### Available Commands
+
+```bash
+# Start everything (frontend + MCP server)
+npm run dev
+
+# Start individually
+npm run dev:frontend         # Next.js on :3000
+npm run dev:mcp              # MCP server on :8000
+npm run dev:agents           # Original CLI interface
+
+# Build & deploy
+npm run build                # Build frontend
+npm run start                # Production server
+
+# Testing
+npm run test:python          # Python tests (pytest)
+npm run test:frontend        # Frontend tests
+
+# Setup
+npm run setup                # Run setup script
+npm run install:all          # Install all dependencies
+```
+
+### Original CLI Still Works
+
+```bash
+# Use the original command-line interface
+python cli.py evaluate --company "Acme Corp"
+python cli.py evaluate --company "TechCo" --sector SaaS --stage seed
+python cli.py config  # View investment thesis
+```
+
+---
+
+## 🎨 Tech Stack
+
+### Frontend
+- **Framework**: Next.js 14 (App Router, React Server Components)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Components**: shadcn/ui (Radix UI primitives)
+- **State**: Zustand, React Query
+- **Deployment**: Vercel
+
+### Backend
+- **MCP Server**: Fast MCP (Python)
+- **Agent Framework**: LangGraph + LangChain
+- **Web API**: FastAPI
+- **LLMs**: Anthropic Claude, OpenAI GPT-4o
+- **Search**: Tavily API
+
+### Infrastructure (Planned)
+- **Authentication**: Supabase Auth
+- **Database**: Supabase (PostgreSQL)
+- **Knowledge Graph**: Neo4j Aura
+- **Vector Store**: Supabase pgvector
+- **Email**: Resend
+- **Monitoring**: LangSmith, OpenTelemetry
+
+---
+
+## 📊 Development Roadmap
+
+### ✅ Phase 1: Foundation (Complete)
+- [x] Modular architecture setup
+- [x] Next.js frontend with module system
+- [x] MCP server wrapping LangGraph agents
+- [x] VC Digital Twin UI (market analysis)
+- [x] Setup and development scripts
+- [x] Documentation
+
+### 🚧 Phase 2: VC Digital Twin Complete (Current)
+- [ ] Financial analysis agent
+- [ ] Technical assessment agent
+- [ ] Team evaluation agent
+- [ ] Legal review agent
+- [ ] Parallel agent execution
+- [ ] Full report generation with exports
+- [ ] Agent streaming updates
+
+### 📋 Phase 3: Note Intelligence (Next)
+- [ ] Note capture UI (camera + upload)
+- [ ] OCR integration (Tesseract.js)
+- [ ] Intelligence tier classification
+- [ ] Neo4j connection and schema
+- [ ] Graduation pipeline implementation
+- [ ] Hybrid RAG setup
+
+### 📋 Phase 4: Orchestration & Control (Future)
+- [ ] Specification parser and executor
+- [ ] GitOps integration
+- [ ] Agent control manager
+- [ ] Policy engine
+- [ ] Cost tracking system
+- [ ] Intelligence dashboard
+
+### 📋 Phase 5: Production & Scale (Future)
+- [ ] Supabase authentication
+- [ ] Multi-tenancy support
+- [ ] Security audit and hardening
+- [ ] Performance optimization
+- [ ] Load testing
+- [ ] Complete deployment automation
+
+---
+
+## 🔌 Integration: MCP Server API
+
+The MCP server exposes LangGraph agents via HTTP:
+
+### Analyze Market
+
+```typescript
+const response = await fetch('http://localhost:8000/tools/analyze_market', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    company_name: 'Acme Corp',
+    sector: 'SaaS',
+    stage: 'seed',
+  })
+})
+```
+
+### Get Resources
+
+```bash
+# Investment thesis
+GET http://localhost:8000/resources/vc://investment-thesis
+
+# Portfolio overview
+GET http://localhost:8000/resources/vc://portfolio
+
+# Market reports
+GET http://localhost:8000/resources/vc://market-reports
+```
+
+---
+
+## 🧩 Adding a New Module
+
+### 1. Create Module Component
+
+```typescript
+// modules/your-module/index.tsx
+"use client"
+
+export function YourModule() {
+  return (
+    <div>
+      <h1>Your Module</h1>
+      {/* Your module UI */}
+    </div>
+  )
+}
+```
+
+### 2. Create Page Route
+
+```typescript
+// frontend/app/modules/your-module/page.tsx
+import { YourModule } from '@/modules/your-module'
+
+export default function Page() {
+  return <YourModule />
+}
+```
+
+### 3. Register Module
+
+```typescript
+// modules/registry.ts
+{
+  id: 'your-module',
+  name: 'Your Module',
+  version: '0.1.0',
+  status: 'development',
+  path: '/modules/your-module',
+  dependencies: ['mcp-server'],
+  permissions: ['read:data', 'write:data'],
+}
+```
+
+### 4. Add MCP Tools (Optional)
+
+```python
+# backend/mcp-server/server.py
+@mcp.tool()
+async def your_module_action(request: YourRequest) -> Dict[str, Any]:
+    """Your module's backend logic"""
+    return {"result": "success"}
+```
+
+---
+
+## 🔐 Environment Variables
+
+### Required
+
+```bash
+# AI Models (at least one)
+OPENAI_API_KEY=sk-...
+# OR
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+### Optional
+
+```bash
+# Search (recommended for VC module)
+TAVILY_API_KEY=tvly-...
+
+# Monitoring
+LANGSMITH_API_KEY=...
+
+# Database (Phase 3+)
+DATABASE_URL=postgresql://...
+
+# Neo4j (Phase 3+)
+NEO4J_URI=neo4j+s://...
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=...
+
+# Supabase (Phase 2+)
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+
+# Feature Flags
+NEXT_PUBLIC_ENABLE_VC_MODULE=true
+NEXT_PUBLIC_ENABLE_NOTE_INTELLIGENCE=false
+```
+
+---
+
+## 🧪 Testing
+
+```bash
+# Python tests
+pytest tests/
+pytest tests/ --cov=src  # With coverage
+
+# Frontend tests
+cd frontend && npm test
+
+# Integration tests
+pytest tests/integration/
+
+# Type checking
+mypy src/
+cd frontend && npm run type-check
+```
+
+---
+
+## 📚 Documentation
+
+- **Architecture Overview**: This README
+- **Module Development**: `docs/modules.md` (planned)
+- **MCP Server API**: `docs/mcp-api.md` (planned)
+- **Deployment Guide**: `docs/deployment.md` (planned)
+- **Original VC Twin Docs**: See `src/` directory
+
+---
+
+## 🎯 Design Principles
+
+1. **Modular by Design**: Each capability is a self-contained module
+2. **Agent-First**: Multi-agent systems orchestrate complex workflows
+3. **Knowledge Evolution**: Information graduates from expensive → cheap
+4. **Company as Code**: Specifications drive everything
+5. **Speed over Perfection**: Strawman for rapid learning and iteration
+
+---
+
+## 🤝 Contributing
+
+This is a strawman prototype built for rapid iteration. Contributions welcome:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+**Areas of Interest:**
+- New modules (Spec Orchestrator, Note Intelligence, etc.)
+- Additional VC due diligence agents
+- UI/UX improvements
+- Performance optimizations
+- Documentation
+
+---
+
+## 📝 License
+
+[Your License Here]
+
+---
+
+## 🙏 Acknowledgments
+
+Built with:
+- **LangGraph** - Multi-agent orchestration framework
+- **Next.js** - React framework by Vercel
+- **Fast MCP** - Model Context Protocol server
+- **shadcn/ui** - Beautiful component library
+- **Anthropic Claude** & **OpenAI GPT-4** - Foundation models
+
+Inspired by:
+- Anthropic's multi-agent system guidelines
+- Company-as-code principles
+- Intelligence graduation concepts
+- Modern web development patterns
+
+---
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/your-repo/capos/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-repo/capos/discussions)
+- **Documentation**: See `/docs` (coming soon)
+
+---
+
+**Capital OS** - Building intelligence that evolves 🚀
